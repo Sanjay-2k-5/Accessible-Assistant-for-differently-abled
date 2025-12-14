@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Object Detection - Accessible Assistant</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+</head>
+<body class="bg-black text-white min-h-screen flex items-center justify-center px-4">
+  <div class="max-w-xl w-full bg-gray-900 rounded-2xl shadow-2xl p-8 space-y-6">
+    <h1 class="text-3xl font-bold text-center text-purple-400">📷 Object Detection</h1>
+
+    <div class="w-full bg-gray-800 rounded-lg overflow-hidden h-64 flex items-center justify-center">
+      <video id="video" autoplay class="w-full h-full object-cover rounded-lg"></video>
+    </div>
+
+    <button onclick="captureAndDetect()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-xl text-lg font-semibold shadow">
+      📸 Capture & Detect
+    </button>
+
+    <div id="results" class="mt-6 space-y-4">
+      <h2 class="text-xl font-semibold text-center text-gray-300">Detected Objects:</h2>
+      <div class="w-full bg-gray-800 rounded-lg overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-700">
+          <thead class="bg-gray-700 text-gray-200">
+            <tr>
+              <th class="px-4 py-2 text-left">#</th>
+              <th class="px-4 py-2 text-left">Object</th>
+            </tr>
+          </thead>
+          <tbody id="objectTableBody" class="bg-gray-900">
+            <tr>
+              <td colspan="2" class="px-4 py-2 text-gray-400">No objects detected yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="text-center mt-4">
+        <a href="/blind" class="text-sm text-gray-400 hover:underline">← Back to Blind Mode</a>
+    </div>
+  </div>
+
+  <script>
+    const video = document.getElementById('video');
+    let stream;
+
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      speechSynthesis.speak(utterance);
+    }
+
+    function startCamera() {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(vidStream => {
+          stream = vidStream;
+          video.srcObject = stream;
+        })
+        .catch(error => alert("Camera error: " + error));
+    }
+
+    function captureAndDetect() {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const base64Image = canvas.toDataURL('image/jpeg');
+
+      fetch('/api/object-detection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64Image })
+      })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then(data => {
+        const tableBody = document.getElementById('objectTableBody');
+        tableBody.innerHTML = ''; // Clear previous
+
+        if (data.status === 'success' && data.objects.length > 0) {
+          data.objects.forEach((obj, index) => {
+            const row = `<tr class="border-t border-gray-700">
+                           <td class="px-4 py-2">${index + 1}</td>
+                           <td class="px-4 py-2">${obj}</td>
+                         </tr>`;
+            tableBody.insertAdjacentHTML('beforeend', row);
+          });
+
+          speak("Detected objects are: " + data.objects.join(', '));
+        } else {
+          const row = `<tr><td colspan="2" class="px-4 py-2 text-gray-400">No objects detected.</td></tr>`;
+          tableBody.innerHTML = row;
+          speak("No objects detected.");
+        }
+      })
+      .catch(err => {
+        console.error("Error:", err);
+        alert("Error during object detection: " + err.message);
+      });
+    }
+
+    // Voice recognition setup
+    window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = function(event) {
+      const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+      console.log("Voice Command:", transcript);
+
+      if (transcript.includes("start camera") || transcript.includes("start") || transcript.includes("open camera") || transcript.includes("camera")) {
+        speak("Starting camera");
+        startCamera();
+      } else if (transcript.includes("detect object") || transcript.includes("capture image") || transcript.includes("capture") || transcript.includes("detect") || transcript.includes("object")) {
+        speak("Capturing and detecting");
+        captureAndDetect();
+      }
+    };
+
+    recognition.onerror = function(e) {
+      console.error("Speech recognition error:", e.error);
+    };
+
+    // Auto-start camera and voice recognition on page load
+    window.onload = () => {
+      try {
+        startCamera(); // Auto-start camera
+        recognition.start(); // Start voice control
+        speak("Voice control activated. Say 'Detect object' to begin.");
+      } catch (e) {
+        console.error("Initialization error:", e);
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Volunteer Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-green-50 min-h-screen flex items-center justify-center px-4">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full p-8 space-y-6 text-center">
+    <h1 class="text-3xl font-bold text-green-700">Volunteer Dashboard</h1>
+    <p class="text-gray-600 text-lg">Thank you for joining as a volunteer! 🙏</p>
+
+    <!-- Show buttons only if a request exists -->
+    <div id="requestStatus" class="border border-green-200 rounded-xl p-4 bg-green-100 text-left space-y-2">
+      <p class="text-green-800 font-semibold">🔔 Current Status:</p>
+      <p id="statusMessage" class="text-gray-700">No help requests yet.</p>
+    </div>
+
+    <!-- Accept and Reject buttons -->
+    <div id="buttonsArea" class="space-y-4 mt-6">
+      <button onclick="acceptRequest()" class="py-3 px-6 bg-green-600 text-white rounded-xl hover:bg-green-700 font-semibold shadow">
+        ✔️ Accept Request
+      </button>
+      <button onclick="rejectRequest()" class="py-3 px-6 bg-red-600 text-white rounded-xl hover:bg-red-700 font-semibold shadow">
+        ❌ Reject Request
+      </button>
+    </div>
+
+    <button onclick="goBack()" class="mt-6 py-3 px-6 bg-green-600 text-white rounded-xl hover:bg-green-700 font-semibold shadow">
+      ⬅ Back to Login
+    </button>
+  </div>
+
+  <script>
+    // Simulate checking if there is a request
+    if (localStorage.getItem("volunteerRequested") === "true") {
+      document.getElementById("statusMessage").innerText = "🚨 Help request received from a nearby user!";
+      localStorage.setItem("volunteerRequested", "false"); // Clear the request after it's received
+    } else {
+      document.getElementById("statusMessage").innerText = "No current help requests.";
+      document.getElementById("buttonsArea").style.display = "none"; // Hide buttons if no request
+    }
+  
+    // Accept request logic
+    function acceptRequest() {
+      localStorage.setItem("volunteerAccepted", "true"); // Set the volunteer's acceptance
+      document.getElementById("statusMessage").innerText = "✅ You accepted the request!";
+      // Update the user page after acceptance
+      localStorage.setItem("volunteerAcceptedMessage", " Muthu accepted to assist you!\nPH.NO:8148231583");
+    }
+  
+    // Reject request logic
+    function rejectRequest() {
+      document.getElementById("statusMessage").innerText = "❌ You rejected the request.";
+    }
+  
+    // Go back to the main login page
+    function goBack() {
+      window.location.href = "/";
+    }
+  </script>
+  
+  
+</body>
+</html>

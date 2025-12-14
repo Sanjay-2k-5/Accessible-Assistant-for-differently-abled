@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Accessible Assistant</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center px-4">
+  <div class="max-w-xl w-full bg-white rounded-2xl shadow-2xl p-8 space-y-6 text-center">
+    <h1 class="text-3xl font-bold text-center text-indigo-700">Accessible Assistant</h1>
+
+    <div class="grid grid-cols-1 gap-4">
+      <button onclick="goToBlindMode()" class="w-full py-4 px-6 text-white bg-blue-600 hover:bg-blue-700 rounded-xl text-lg font-semibold shadow">
+        👁️‍🗨️ Blind Mode
+      </button>
+      <button onclick="selectMode('deaf')" class="w-full py-4 px-6 text-white bg-green-600 hover:bg-green-700 rounded-xl text-lg font-semibold shadow">
+        🧏 Deaf or Mute Mode
+      </button>
+      <button onclick="selectMode('normal')" class="w-full py-4 px-6 text-white bg-purple-600 hover:bg-purple-700 rounded-xl text-lg font-semibold shadow">
+        👤 Control Appliance
+      </button>
+      <button id="findVolunteerBtn" onclick="findVolunteer()" class="w-full py-4 px-6 text-white bg-blue-600 hover:bg-teal-700 rounded-xl text-lg font-semibold shadow mt-4">
+        👥 Find Volunteer
+      </button>
+    </div>
+
+    <div id="statusArea" class="border border-indigo-200 rounded-xl p-4 bg-indigo-100 text-left space-y-2 mt-6 hidden">
+      <p id="statusMessage" class="text-indigo-800 font-semibold text-lg"></p>
+    </div>
+
+    <div class="mt-4 text-center text-gray-700 text-lg">
+      <p id="waitingStatus"></p>
+    </div>
+  </div>
+
+  <!-- Voice mic icon (centered bottom) -->
+  <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 bg-indigo-100 text-indigo-800 px-4 py-2 rounded-xl shadow-lg">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 animate-pulse text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1v14m0 0a4 4 0 004-4H8a4 4 0 004 4zm0 0v4m-4 0h8" />
+    </svg>
+    <span class="font-semibold">Voice control active</span>
+  </div>
+
+  <script>
+    let checkInterval;
+
+    window.onload = function () {
+      document.getElementById("statusArea").classList.add("hidden");
+      localStorage.removeItem("volunteerAccepted");
+      localStorage.removeItem("volunteerRequested");
+      localStorage.removeItem("volunteerAcceptedMessage");
+      document.getElementById("statusMessage").innerText = "";
+      document.getElementById("waitingStatus").innerHTML = "";
+      initVoiceControl();
+    };
+
+    function goToBlindMode() {
+      const status = document.getElementById("statusMessage");
+      document.getElementById("statusArea").classList.remove("hidden");
+      status.innerText = "Blind mode selected. Redirecting...";
+      speechSynthesis.speak(new SpeechSynthesisUtterance("Blind mode selected. Redirecting to features."));
+      setTimeout(() => window.location.href = "/blind", 2000);
+    }
+
+    function selectMode(mode) {
+      const status = document.getElementById("statusMessage");
+      document.getElementById("statusArea").classList.remove("hidden");
+
+      if (mode === 'deaf') {
+        status.innerText = "Deaf mode selected. Visual assistance enabled.";
+        setTimeout(() => window.location.href = "/deaf", 1000);
+      } else if (mode === 'normal') {
+        status.innerText = "Control Appliance mode selected.";
+        setTimeout(() => window.location.href = "/gesture", 1000);
+      }
+    }
+
+    function findVolunteer() {
+      const status = document.getElementById("statusMessage");
+      const waitingStatus = document.getElementById("waitingStatus");
+      const statusArea = document.getElementById("statusArea");
+
+      localStorage.setItem("volunteerRequested", "true");
+      localStorage.removeItem("volunteerAccepted");
+      localStorage.removeItem("volunteerAcceptedMessage");
+
+      statusArea.classList.remove("hidden");
+      status.innerText = "🔍 Finding volunteer...";
+      waitingStatus.innerHTML = `
+        <div class="flex justify-center items-center space-x-2 mt-2">
+          <div class="w-4 h-4 bg-blue-600 rounded-full animate-ping"></div>
+          <div class="w-4 h-4 bg-blue-600 rounded-full animate-ping animation-delay-200ms"></div>
+          <div class="w-4 h-4 bg-blue-600 rounded-full animate-ping animation-delay-400ms"></div>
+        </div>
+        <p class="mt-2">Waiting for volunteer to accept your request...</p>
+      `;
+      speechSynthesis.speak(new SpeechSynthesisUtterance("Finding volunteer. Please wait..."));
+
+      checkInterval = setInterval(() => {
+        const accepted = localStorage.getItem("volunteerAccepted");
+        const message = localStorage.getItem("volunteerAcceptedMessage");
+        if (accepted === "true" && message) {
+          status.innerText = message;
+          waitingStatus.innerHTML = "";
+          clearInterval(checkInterval);
+        }
+      }, 1000);
+
+      document.getElementById("findVolunteerBtn").disabled = true;
+      document.getElementById("findVolunteerBtn").classList.add("opacity-50", "cursor-not-allowed");
+    }
+
+    function initVoiceControl() {
+      if (!('webkitSpeechRecognition' in window)) {
+        alert("Your browser does not support speech recognition.");
+        return;
+      }
+
+      const recognition = new webkitSpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = function (event) {
+        const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+        console.log("Voice Command:", transcript);
+
+        if (transcript.includes("blind")) {
+          goToBlindMode();
+        } else if (transcript.includes("deaf") || transcript.includes("def") || transcript.includes("death") || transcript.includes("mute")) {
+          selectMode('deaf');
+        } else if (transcript.includes("control") || transcript.includes("normal")) {
+          selectMode('normal');
+        } else if (transcript.includes("volunteer") || transcript.includes("help")) {
+          findVolunteer();
+        }
+      };
+
+      recognition.onerror = function (event) {
+        console.error("Speech recognition error:", event.error);
+      };
+
+      recognition.start();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gesture Control - Accessible Assistant</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+</head>
+<body class="bg-black text-white min-h-screen flex items-center justify-center px-4">
+  <div class="max-w-xl w-full bg-gray-900 rounded-2xl shadow-2xl p-8 space-y-6">
+    <h1 class="text-3xl font-bold text-center text-blue-400">🤖 Gesture Controlled Appliances</h1>
+
+    <div class="w-full bg-gray-800 rounded-lg overflow-hidden h-64 flex items-center justify-center">
+      <video id="video" autoplay class="w-full h-full object-cover rounded-lg"></video>
+    </div>
+
+    <button onclick="captureAndDetect()" class="w-full py-3 bg-green-600 hover:bg-green-700 rounded-xl text-lg font-semibold shadow">
+      ✋ Detect Gesture
+    </button>
+
+    <div id="results" class="mt-6 space-y-4">
+      <h2 class="text-xl font-semibold text-center text-gray-300">Detection Result:</h2>
+      <div class="w-full bg-gray-800 rounded-lg p-4 text-center text-lg text-white font-mono" id="resultText">
+        Awaiting gesture...
+      </div>
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="/index" class="text-sm text-gray-400 hover:underline">← Back to Main menu</a>
+    </div>
+  </div>
+
+  <script>
+    const video = document.getElementById('video');
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(err => {
+        alert("Camera access error: " + err.message);
+      });
+
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      speechSynthesis.speak(utterance);
+    }
+
+    function captureAndDetect() {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const base64Image = canvas.toDataURL('image/jpeg');
+
+      fetch('/api/gesture-control', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64Image })
+      })
+      .then(res => res.json())
+      .then(data => {
+        const resultBox = document.getElementById('resultText');
+        if (data.status === 'success') {
+          const message = `Detected ${data.finger_count} finger(s) ➜ ${data.appliance_name} is ${data.appliance_status}`;
+          resultBox.textContent = message;
+          speak(message);
+        } else {
+          resultBox.textContent = "Detection failed.";
+          speak("Detection failed.");
+        }
+      })
+      .catch(err => {
+        alert("Gesture detection error: " + err.message);
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Book Reader - In-Browser</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+</head>
+<body class="bg-black text-white min-h-screen flex items-center justify-center px-4">
+  <div class="max-w-xl w-full bg-gray-900 rounded-2xl shadow-2xl p-8 space-y-6">
+    <h1 class="text-3xl font-bold text-center text-green-400">📖 Book Reader</h1>
+
+    <div id="camera-container" class="w-full bg-gray-800 rounded-lg overflow-hidden h-64 flex items-center justify-center">
+      <video id="video" autoplay class="w-full h-full object-cover rounded-lg"></video>
+    </div>
+
+    <button onclick="startCamera()" class="w-full py-3 bg-green-600 hover:bg-green-700 rounded-xl text-lg font-semibold shadow">
+      🎥 Start Camera
+    </button>
+
+    <button onclick="captureImage()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-xl text-lg font-semibold shadow">
+      📸 Capture Image & Extract Text
+    </button>
+
+    <textarea id="output" rows="5" class="w-full p-4 bg-gray-800 text-white border border-gray-700 rounded-lg focus:outline-none" placeholder="Captured text will appear here..." readonly></textarea>
+
+    <div class="text-center mt-4">
+      <a href="/blind" class="text-sm text-gray-400 hover:underline">← Back to Blind Mode</a>
+    </div>
+  </div>
+
+  <script>
+    let videoStream;
+
+    function startCamera() {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+          videoStream = stream;
+          document.getElementById('video').srcObject = stream;
+        })
+        .catch(error => alert("Camera error: " + error));
+    }
+
+    function captureImage() {
+      const video = document.getElementById('video');
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(blob => sendImageToBackend(blob), 'image/png');
+    }
+
+    function sendImageToBackend(imageBlob) {
+      const reader = new FileReader();
+      reader.onloadend = function () {
+        const base64Image = reader.result.split(',')[1];
+
+        fetch('/api/book-reader', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ image: base64Image })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success') {
+            document.getElementById('output').value = data.extracted_text;
+          } else {
+            alert(data.message);
+          }
+        })
+        .catch(err => alert("❌ Failed to send image. " + err));
+      };
+      reader.readAsDataURL(imageBlob);
+    }
+  </script>
+</body>
+</html>

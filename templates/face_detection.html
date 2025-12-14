@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Face Recognition</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+</head>
+<body class="bg-black text-white min-h-screen flex items-center justify-center px-4">
+  <div class="max-w-xl w-full bg-gray-900 rounded-2xl shadow-2xl p-8 space-y-6">
+    <h1 class="text-3xl font-bold text-center text-yellow-400">🧠 Face Recognition</h1>
+
+    <video id="video" autoplay class="rounded-xl w-full"></video>
+
+    <p id="result" class="text-center font-semibold text-lg text-green-400">Status: Waiting...</p>
+
+    <input id="nameInput" type="text" placeholder="Enter your name" class="w-full text-black rounded px-4 py-2"/>
+
+    <div class="grid grid-cols-2 gap-4">
+      <button id="addBtn" class="bg-green-600 hover:bg-green-700 py-3 rounded-xl font-bold">➕ Add Face</button>
+      <button id="startBtn" class="bg-blue-600 hover:bg-blue-700 py-3 rounded-xl font-bold">🎯 Start Recognition</button>
+    </div>
+
+    <div class="mt-4 text-center">
+      <a href="/blind" class="text-sm text-gray-400 hover:underline">← Back to Blind Mode</a>
+    </div>
+  </div>
+
+  <script>
+    const video = document.getElementById('video');
+    const result = document.getElementById('result');
+    const nameInput = document.getElementById('nameInput');
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => video.srcObject = stream)
+      .catch(() => result.innerText = "Camera access denied.");
+
+    function getBase64Frame() {
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      return canvas.toDataURL("image/jpeg");
+    }
+
+    document.getElementById('addBtn').onclick = async () => {
+      const name = nameInput.value.trim();
+      if (!name) return alert("Please enter a name.");
+      const image = getBase64Frame();
+
+      const res = await fetch("/api/add-face", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, image })
+      });
+      const data = await res.json();
+      result.innerText = "Status: " + data.message;
+    };
+
+    let isRecognizing = false;
+    let lastSpokenName = "";
+
+    function speakName(name) {
+      const utterance = new SpeechSynthesisUtterance(name);
+      speechSynthesis.speak(utterance);
+      lastSpokenName = name;
+    }
+
+    document.getElementById('startBtn').onclick = async () => {
+      isRecognizing = !isRecognizing;
+      result.innerText = "Status: " + (isRecognizing ? "Recognizing..." : "Stopped");
+      if (!isRecognizing) return;
+
+      lastSpokenName = ""; // Reset on each start
+
+      async function loop() {
+        if (!isRecognizing) return;
+        const image = getBase64Frame();
+        const res = await fetch("/api/live-face-recognition", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image })
+        });
+        const data = await res.json();
+        const name = data.name || "Unknown";
+        result.innerText = "Detected: " + name;
+
+        if (name !== lastSpokenName) {
+          speakName(name);
+        }
+
+        setTimeout(loop, 1000);
+      }
+
+      loop();
+    };
+  </script>
+</body>
+</html>

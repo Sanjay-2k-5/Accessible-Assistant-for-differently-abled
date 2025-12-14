@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blind Mode - Accessible Assistant</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+</head>
+<body class="bg-black text-white min-h-screen flex flex-col justify-between items-center px-4 py-8">
+  <div class="max-w-xl w-full bg-gray-900 rounded-2xl shadow-2xl p-8 space-y-8">
+    <h1 class="text-3xl font-bold text-center text-yellow-400">👁️‍🗨️ Blind Mode</h1>
+
+    <div class="grid grid-cols-1 gap-4">
+      <button id="ttsBtn" class="w-full py-4 px-6 bg-blue-600 hover:bg-blue-700 rounded-xl text-lg font-semibold shadow focus:outline-none">
+        🔊 Text to Speech
+      </button>
+      <button id="sttBtn" class="w-full py-4 px-6 bg-green-600 hover:bg-green-700 rounded-xl text-lg font-semibold shadow focus:outline-none">
+        🎙️ Speech to Text
+      </button>
+      <button id="odBtn" class="w-full py-4 px-6 bg-purple-600 hover:bg-purple-700 rounded-xl text-lg font-semibold shadow focus:outline-none">
+        📷 Object Detection
+      </button>
+      <button id="brBtn" class="w-full py-4 px-6 bg-yellow-500 hover:bg-yellow-600 text-gray-900 rounded-xl text-lg font-semibold shadow focus:outline-none">
+        📖 Book Reader
+      </button>
+      <button id="frBtn" class="w-full py-4 px-6 bg-red-600 hover:bg-red-700 rounded-xl text-lg font-semibold shadow focus:outline-none">
+        🧠 Face Recognition
+      </button>      
+    </div>
+
+    <div class="mt-6 text-center">
+      <a href="/index" class="text-sm text-gray-400 hover:underline">← Back to main menu</a>
+    </div>
+  </div>
+
+  <!-- Center mic icon below -->
+  <div class="fixed bottom-10 flex justify-center w-full">
+    <div class="bg-yellow-400 text-black rounded-full p-4 shadow-lg text-2xl">
+      🎤
+    </div>
+  </div>
+
+  <script>
+    function giveAudioFeedback(message) {
+      const utterance = new SpeechSynthesisUtterance(message);
+      speechSynthesis.speak(utterance);
+    }
+
+    // Button actions
+    document.getElementById('ttsBtn').addEventListener('click', () => {
+      giveAudioFeedback('Text to Speech option selected');
+      window.location.href = '/tts';
+    });
+
+    document.getElementById('sttBtn').addEventListener('click', () => {
+      giveAudioFeedback('Speech to Text option selected');
+      window.location.href = '/stt';
+    });
+
+    document.getElementById('odBtn').addEventListener('click', () => {
+      giveAudioFeedback('Object Detection option selected');
+      window.location.href = '/objectdetection';
+    });
+
+    document.getElementById('brBtn').addEventListener('click', () => {
+      giveAudioFeedback('Book Reader option selected');
+      window.location.href = '/bookreader';
+    });
+
+    document.getElementById('frBtn').addEventListener('click', () => {
+      giveAudioFeedback('Face Recognition option selected');
+      window.location.href = '/face';
+    });
+
+    // Auto-start voice recognition on load
+    window.onload = function () {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.start();
+      giveAudioFeedback("Welcome to blind mode.");
+
+      recognition.onresult = function (event) {
+        const command = event.results[0][0].transcript.toLowerCase();
+        console.log("Voice Command:", command);
+
+        if (command.includes("text to speech")) window.location.href = "/tts";
+        else if (command.includes("speech to text")) window.location.href = "/stt";
+        else if (command.includes("object detection")) window.location.href = "/objectdetection";
+        else if (command.includes("book reader")) window.location.href = "/bookreader";
+        else if (command.includes("face recognition")) window.location.href = "/face";
+        else if (command.includes("go back")) window.location.href = "/index";
+      };
+    };
+  </script>
+</body>
+</html>

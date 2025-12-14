@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deaf Mode</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-blue-50 min-h-screen flex items-center justify-center px-4">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full p-8 space-y-6 text-center">
+    <h1 class="text-3xl font-bold text-blue-700">Deaf And Mute Mode</h1>
+    <p class="text-gray-600 text-lg"> Use the options below for Text-to-Speech (TTS) and Speech-to-Text (STT).</p>
+
+    <!-- Buttons to redirect to TTS and STT pages -->
+    <div class="space-y-6 mt-6">
+      <button onclick="goToTTS()" class="w-full py-4 px-6 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-semibold shadow">
+        🎙️ Go to Text-to-Speech (TTS)
+      </button>
+      <button onclick="goToSTT()" class="w-full py-4 px-6 bg-green-600 text-white rounded-xl hover:bg-green-700 font-semibold shadow">
+        🎤 Go to Speech-to-Text (STT)
+      </button>
+    </div>
+
+    <!-- Back to main page -->
+    <button onclick="goBack()" class="mt-6 py-3 px-6 bg-gray-600 text-white rounded-xl hover:bg-gray-700 font-semibold shadow">
+      ⬅ Back to main menu
+    </button>
+  </div>
+
+  <script>
+    // Redirect to TTS page
+    function goToTTS() {
+      window.location.href = "/tts1"; // Redirect to tts.html
+    }
+
+    // Redirect to STT page
+    function goToSTT() {
+      window.location.href = "/stt1"; // Redirect to stt.html
+    }
+
+    // Go back to the main login page
+    function goBack() {
+      window.location.href = "/index";
+    }
+  </script>
+</body>
+</html>
