@@ -1,56 +1,109 @@
- 🧑‍🦯 Accessible Assistant
+# ♿ Accessible Assistant for Differently Abled
 
-An assistant designed to support blind, deaf, mute, and all users. Integrates computer vision, speech technologies, and assistive interfaces to make digital interaction accessible for everyone.
+An AI-powered assistive system designed to support visually impaired, hearing impaired, and speech impaired individuals by leveraging Computer Vision, Speech Processing, and Deep Learning technologies. This project aims to enhance accessibility and inclusivity by providing real-time assistance through an intelligent web-based interface.
 
- 🚀 Features
+## 🌟 Key Features
 
- For Blind Users 👁️
-- Object Detection (YOLOv8 + OpenCV)
-- Real-time Book Reader (OCR + Text-to-Speech)
-- Voice Commands & Navigation
+### 👁️ Assistance for Visually Impaired
+- Object Detection using YOLOv8
+- Face Recognition
+- Book Reader (text extraction with audio output)
+- Audio-based navigation support
 
- For Deaf Users 👂
-- Speech-to-Text (STT) for live transcription
-- Real-time conversation support
+### 🧏 Assistance for Hearing Imppaired
+- Speech-to-Text (STT)
+- Gesture Recognition
+- Visual text-based interaction
 
- For Mute Users 🗣️
-- Text-to-Speech (TTS) for communication
-- Simple typing → automatic voice output
+### 🗣️ Assistance for Speech Impaired
+- Text-to-Speech (TTS)
+- Gesture-based communication
+- Web-based interaction interface
 
- For General Users 👨‍💻
-- General-purpose assistant features
-- Volunteer support system
+## 🛠️ Technologies Used
+- Python
+- Flask (Web Framework)
+- OpenCV
+- YOLOv8 (Ultralytics)
+- Speech Recognition
+- Text-to-Speech (TTS)
+- HTML, CSS, JavaScript
+- Computer Vision & Deep Learning
 
- Additional Functionalities
-- Gesture-controlled appliances (MediaPipe + OpenCV)
-- Face Recognition (FaceNet)
+## 📁 Project Structure
+Accessible-Assistant-for-differently-abled/
+├── app.py
+├── features/
+│   ├── object_detection.py
+│   ├── face_recognition.py
+│   ├── gesture.py
+│   ├── book_reader.py
+│   ├── stt.py
+│   └── tts.py
+├── templates/
+│   ├── index.html
+│   ├── blind.html
+│   ├── deaf.html
+│   ├── volunteer.html
+│   ├── gesture.html
+│   ├── object_detection.html
+│   ├── stt.html
+│   └── tts.html
+├── static/
+│   └── js/
+│       └── app.js
+├── README.md
+└── requirements.txt
 
-**Volunteer System:** Users can request nearby volunteers for help (ongoing).
+## 🚀 How to Run the Project
 
- 🏗️ Tech Stack
+1. Clone the repository  
+git clone https://github.com/Sanjay-2k-5/Accessible-Assistant-for-differently-abled.git  
+cd Accessible-Assistant-for-differently-abled  
 
-- **Frontend:** HTML, Tailwind CSS, JavaScript
-- **Backend:** Python (Flask)
-- **AI/ML:** OpenCV, YOLOv8, MediaPipe, FaceNet, Tesseract OCR
-- **Speech Tools:** pyttsx3, SpeechRecognition, Web Speech API
+2. Create a virtual environment (recommended)  
+python -m venv venv  
+source venv/bin/activate  (macOS / Linux)  
+venv\Scripts\activate  (Windows)  
 
- 🚦 Installation
+3. Install dependencies  
+pip install -r requirements.txt  
 
-git clone https://github.com/MUTHU0029/accessible-assistant.git
-cd accessible-assistant
-pip install -r requirements.txt
-python app.py
+4. Download YOLOv8 model  
+Download yolov8s.pt from:  
+https://github.com/ultralytics/ultralytics  
+Place the file in the project root directory.  
+The model file is not included in the repository to keep it lightweight.
 
- 📚 Usage
+5. Run the application  
+python app.py  
 
-Blind Mode: Select Blind → Use object detection & book reader
+Open browser and go to:  
+http://127.0.0.1:5000  
 
-Deaf Mode: Select Deaf → Speech → Text transcription
+## 🎯 Use Cases
+- Helps blind users identify objects and read books
+- Converts speech into text for hearing-impaired users
+- Enables speech-impaired users to communicate via text and gestures
+- Provides an inclusive human–computer interaction system
 
-Mute Mode: Select Mute → Type and convert to speech
+## 🧠 Future Enhancements
+- Mobile application support
+- Multi-language speech recognition
+- Cloud-based AI inference
+- Improved gesture recognition accuracy
+- IoT device integration
+- Voice-controlled navigation
 
-Normal Mode: Access all features + volunteer support
+## 👨‍💻 Author
+Sanjay  
+GitHub: https://github.com/Sanjay-2k-5  
 
- 📝 License
+## 📜 License
+This project is developed for educational and research purposes. You are free to use, modify, and distribute this project with proper credit.
 
-This project is licensed under the MIT License – free to use and modify.
+## ⭐ Acknowledgements
+- YOLOv8 – Ultralytics
+- OpenCV Community
+- Flask Documentation
+- Open-source contributors and libraries
