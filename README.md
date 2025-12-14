@@ -32,6 +32,7 @@ An AI-powered assistive system designed to support visually impaired, hearing im
 
 ## 📁 Project Structure
 
+```
 - app.py – Main Flask application
 - features/
   - object_detection.py
@@ -52,32 +53,45 @@ An AI-powered assistive system designed to support visually impaired, hearing im
 - static/ – Frontend JavaScript files
 - requirements.txt
 - README.md
+```
 
 ## 🚀 How to Run the Project
 
 1. Clone the repository
+```bash
 git clone https://github.com/Sanjay-2k-5/Accessible-Assistant-for-differently-abled.git  
-cd Accessible-Assistant-for-differently-abled```
+cd Accessible-Assistant-for-differently-abled
+```
 
-2. Create a virtual environment (recommended)  
+2. Create a virtual environment (recommended)
+```bash
 python -m venv venv  
 source venv/bin/activate  (macOS / Linux)  
-venv\Scripts\activate  (Windows)  
+venv\Scripts\activate  (Windows)
+```
 
-3. Install dependencies  
-pip install -r requirements.txt  
+3. Install dependencies
+```bash
+pip install -r requirements.txt
+```
 
 4. Download YOLOv8 model  
-Download yolov8s.pt from:  
-https://github.com/ultralytics/ultralytics  
+Download yolov8s.pt from:
+```bash
+https://github.com/ultralytics/ultralytics
+```
 Place the file in the project root directory.  
 The model file is not included in the repository to keep it lightweight.
 
-5. Run the application  
-python app.py  
+5. Run the application
+```bash
+python app.py
+```
 
-Open browser and go to:  
-http://127.0.0.1:5000  
+Open browser and go to: 
+```
+http://127.0.0.1:5000
+```
 
 ## 🎯 Use Cases
 - Helps blind users identify objects and read books
