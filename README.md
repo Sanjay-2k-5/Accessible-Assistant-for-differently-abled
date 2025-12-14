@@ -31,35 +31,33 @@ An AI-powered assistive system designed to support visually impaired, hearing im
 - Computer Vision & Deep Learning
 
 ## 📁 Project Structure
-Accessible-Assistant-for-differently-abled/
-├── app.py
-├── features/
-│   ├── object_detection.py
-│   ├── face_recognition.py
-│   ├── gesture.py
-│   ├── book_reader.py
-│   ├── stt.py
-│   └── tts.py
-├── templates/
-│   ├── index.html
-│   ├── blind.html
-│   ├── deaf.html
-│   ├── volunteer.html
-│   ├── gesture.html
-│   ├── object_detection.html
-│   ├── stt.html
-│   └── tts.html
-├── static/
-│   └── js/
-│       └── app.js
-├── README.md
-└── requirements.txt
+
+- app.py – Main Flask application
+- features/
+  - object_detection.py
+  - face_recognition.py
+  - gesture.py
+  - book_reader.py
+  - stt.py
+  - tts.py
+- templates/
+  - index.html
+  - blind.html
+  - deaf.html
+  - volunteer.html
+  - gesture.html
+  - object_detection.html
+  - stt.html
+  - tts.html
+- static/ – Frontend JavaScript files
+- requirements.txt
+- README.md
 
 ## 🚀 How to Run the Project
 
-1. Clone the repository  
+1. Clone the repository
 git clone https://github.com/Sanjay-2k-5/Accessible-Assistant-for-differently-abled.git  
-cd Accessible-Assistant-for-differently-abled  
+cd Accessible-Assistant-for-differently-abled```
 
 2. Create a virtual environment (recommended)  
 python -m venv venv  
@@ -95,9 +93,6 @@ http://127.0.0.1:5000
 - IoT device integration
 - Voice-controlled navigation
 
-## 👨‍💻 Author
-Sanjay  
-GitHub: https://github.com/Sanjay-2k-5  
 
 ## 📜 License
 This project is developed for educational and research purposes. You are free to use, modify, and distribute this project with proper credit.
